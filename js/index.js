@@ -139,7 +139,7 @@ const removeRow = (e) => {
 
 const editImage = (e) => {
   const container = e.closest(".holder");
-  const img = container.querySelector(".img-wrap img");
+  const img = container.querySelector(".single-image");
   if (!container.querySelector("input.col-md-12")) {
     const row = document.createElement("div");
     const inputFile = document.createElement("input");
@@ -149,6 +149,7 @@ const editImage = (e) => {
 
     inputFile.classList.add("col-md-6");
     inputFile.setAttribute("type", "file");
+    inputFile.setAttribute("accept", "image/*");
     inputFile.style.marginBottom = "20px";
 
     inputText.classList.add("col-md-6");
@@ -181,7 +182,7 @@ const editImage = (e) => {
 
 const editTwoImages = (e) => {
   const container = e.closest(".holder.two-images");
-  const images = document.querySelectorAll(".cursor-more");
+  const images = document.querySelectorAll(".single-image");
   if (!container.querySelector(".row input.col-md-6")) {
     const rowFile = document.createElement("div");
     const rowText = document.createElement("div");
@@ -195,11 +196,14 @@ const editTwoImages = (e) => {
 
     inputFileImage_1.classList.add("col-md-6");
     inputFileImage_1.setAttribute("type", "file");
+    inputFileImage_1.setAttribute("accept", "image/*");
+
+    inputFileImage_2.classList.add("col-md-6");
+    inputFileImage_2.setAttribute("type", "file");
+    inputFileImage_2.setAttribute("accept", "image/*");
 
     inputFileImage_1.style.marginTop = "20px";
     inputFileImage_1.style.marginBottom = "20px";
-    inputFileImage_2.classList.add("col-md-6");
-    inputFileImage_2.setAttribute("type", "file");
 
     inputFileImage_2.style.marginTop = "20px";
     inputFileImage_2.style.marginBottom = "20px";
@@ -302,10 +306,6 @@ const addText = (e) => {
   row.setAttribute("class", "row justify-content-center");
 
   col.setAttribute("class", "col-md-12 padding-top-bottom text-center");
-  col.setAttribute(
-    "data-scroll-reveal",
-    "enter bottom move 30px over 0.5s after 0.2s"
-  );
 
   p.setAttribute("class", "lead");
   p.setAttribute("tabindex", "1");
@@ -352,6 +352,7 @@ const addImage = (e, className) => {
   const wrapper = document.createElement("div");
   const inputFile = document.createElement("input");
   const inputText = document.createElement("input");
+  const row = document.createElement("div");
   const btns = buttons();
   const toolbarImage = createToolbarImage(editImage);
 
@@ -363,12 +364,14 @@ const addImage = (e, className) => {
   wrapper.style.order = order;
   wrapper.id = "id" + order;
 
+  row.setAttribute("class", "row justify-content-center");
+
   inputFile.classList.add("col-md-6");
   inputFile.setAttribute("type", "file");
+  inputFile.setAttribute("accept", "image/*");
+
   inputText.classList.add("col-md-6");
   inputText.setAttribute("type", "text");
-
-  document.querySelector(".main-container").appendChild(wrapper);
 
   inputFile.addEventListener("change", (event) => {
     const file = event.target.files[0];
@@ -376,7 +379,7 @@ const addImage = (e, className) => {
     const reader = new FileReader();
     reader.addEventListener("load", (event) => {
       wrapper.appendChild(toolbarImage);
-      wrapper.appendChild(createImage(event.target.result));
+      row.appendChild(createImage(event.target.result, "col-md-12"));
       wrapper.appendChild(btns);
       wrapper.querySelectorAll(".toolbar")[0].style.display = "block";
       wrapper.querySelectorAll(".toolbar")[1].style.display = "block";
@@ -388,13 +391,18 @@ const addImage = (e, className) => {
 
   inputText.addEventListener("paste", (event) => {
     wrapper.appendChild(toolbarImage);
-    wrapper.appendChild(createImage(event.clipboardData.getData("text")));
+    row.appendChild(
+      createImage(event.clipboardData.getData("text"), "col-md-12")
+    );
     wrapper.appendChild(btns);
     wrapper.querySelectorAll(".toolbar")[0].style.display = "block";
     wrapper.querySelectorAll(".toolbar")[1].style.display = "block";
     wrapper.removeChild(inputFile);
     wrapper.removeChild(inputText);
   });
+
+  wrapper.appendChild(row);
+  document.querySelector(".main-container").appendChild(wrapper);
 
   for (let i = 0; i < containers.length; i++) {
     if (parseInt(containers[i].style.order) >= parseInt(wrapper.style.order)) {
@@ -430,9 +438,11 @@ const addTwoImages = (e) => {
 
   inputFileImage_1.classList.add("col-md-6");
   inputFileImage_1.setAttribute("type", "file");
+  inputFileImage_1.setAttribute("accept", "image/*");
 
   inputFileImage_2.classList.add("col-md-6");
   inputFileImage_2.setAttribute("type", "file");
+  inputFileImage_2.setAttribute("accept", "image/*");
 
   inputTextImage_1.classList.add("col-md-6");
   inputTextImage_1.setAttribute("type", "text");
@@ -447,12 +457,11 @@ const addTwoImages = (e) => {
 
     const reader = new FileReader();
     reader.addEventListener("load", (event) => {
-      row.appendChild(
-        createCustomImage(event.target.result, file.name, "col-md-6")
-      );
+      row.appendChild(createImage(event.target.result, "col-md-6"));
     });
     reader.readAsDataURL(file);
     wrapper.removeChild(inputFileImage_1);
+    wrapper.removeChild(inputTextImage_1);
   });
 
   inputFileImage_2.addEventListener("change", (event) => {
@@ -461,37 +470,28 @@ const addTwoImages = (e) => {
     const reader = new FileReader();
     reader.addEventListener("load", (event) => {
       row.appendChild(
-        createCustomImage(
-          event.target.result,
-          file.name,
-          "col-md-6 mt-4 mt-md-0"
-        )
+        createImage(event.target.result, "col-md-6 mt-4 mt-md-0")
       );
     });
     reader.readAsDataURL(file);
     wrapper.removeChild(inputFileImage_2);
+    wrapper.removeChild(inputTextImage_2);
   });
 
   inputTextImage_1.addEventListener("paste", (event) => {
     row.appendChild(
-      createCustomImage(
-        event.clipboardData.getData("text"),
-        event.clipboardData.getData("text"),
-        "col-md-6"
-      )
+      createImage(event.clipboardData.getData("text"), "col-md-6")
     );
 
+    wrapper.removeChild(inputFileImage_1);
     wrapper.removeChild(inputTextImage_1);
   });
 
   inputTextImage_2.addEventListener("paste", (event) => {
     row.appendChild(
-      createCustomImage(
-        event.clipboardData.getData("text"),
-        event.clipboardData.getData("text"),
-        "col-md-6 mt-4 mt-md-0"
-      )
+      createImage(event.clipboardData.getData("text"), "col-md-6 mt-4 mt-md-0")
     );
+    wrapper.removeChild(inputFileImage_2);
     wrapper.removeChild(inputTextImage_2);
   });
 
@@ -517,59 +517,22 @@ const addTwoImages = (e) => {
   ordered();
 };
 
-const createImage = (url) => {
-  const row = document.createElement("div");
+const createImage = (url, className) => {
   const col = document.createElement("div");
-  const wrap = document.createElement("div");
-  const image = document.createElement("img");
-
-  row.setAttribute("class", "row justify-content-center");
-
-  col.setAttribute("class", "col-md-12 padding-top-bottom text-center");
-  col.setAttribute(
-    "data-scroll-reveal",
-    "enter bottom move 30px over 0.5s after 0.2s"
-  );
-
-  wrap.classList.add("img-wrap");
-
-  image.classList.add("image-full");
-  image.src = url;
-
-  wrap.appendChild(image);
-  col.appendChild(wrap);
-  row.appendChild(col);
-  return row;
-  // image.addEventListener("load", (e) => {
-  //   if (image.height <= 615 && image.width <= 1885) {
-  //   } else {
-  //     alert("This image can not be applyed! Please try with another!");
-  //   }
-  // });
-};
-
-const createCustomImage = (url, href, className) => {
-  const col = document.createElement("div");
-  const link = document.createElement("a");
   const wrap = document.createElement("div");
   const image = document.createElement("img");
 
   col.setAttribute("class", className);
 
-  link.setAttribute("data-fancybox", "gallery");
-  link.classList.add("cursor-link");
-
   wrap.classList.add("img-wrap");
 
-  image.classList.add("cursor-more");
+  image.setAttribute("class", "single-image");
 
-  link.href = href;
-  image.classList.add("image-full");
   image.src = url;
 
   wrap.appendChild(image);
-  link.appendChild(wrap);
-  col.appendChild(link);
+  col.appendChild(wrap);
+
   return col;
 };
 
